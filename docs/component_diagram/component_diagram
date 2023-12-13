@@ -1,0 +1,16 @@
+@startuml
+
+title Component diagram
+
+component [Frontend] as Frontend
+component [Backend] as Backend
+component [Database] as Database
+component [Storage] as Storage
+component [Cache] as Cache
+
+Frontend <-> Backend
+Backend <-> Storage
+Backend <-up-> Database
+Backend <-down-> Cache
+
+@enduml

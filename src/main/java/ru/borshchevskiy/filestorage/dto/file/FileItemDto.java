@@ -20,10 +20,10 @@ public class FileItemDto {
      * Root user directory is not included in path.
      */
     private String fullName;
-    /**
-     * Same as {@link #fullName}, but URL-encoded.
-     */
-    private String encodedFullName;
+//    /**
+//     * Same as {@link #fullName}, but URL-encoded.
+//     */
+//    private String encodedFullName;
     /**
      * Boolean flag, true if object is directory, false if it is a file.
      */

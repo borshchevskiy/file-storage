@@ -33,9 +33,9 @@ public class FileItemMapper {
         FileItemDto fileItemDto = new FileItemDto();
         fileItemDto.setFullName(FilePathUtil.removeUserDirectoryFromPath(userSessionData, item.objectName()));
         fileItemDto.setName(getName(item));
-        fileItemDto.setEncodedFullName(URLEncoder.encode(
-                FilePathUtil.removeUserDirectoryFromPath(userSessionData, item.objectName()),
-                StandardCharsets.UTF_8));
+//        fileItemDto.setEncodedFullName(URLEncoder.encode(
+//                FilePathUtil.removeUserDirectoryFromPath(userSessionData, item.objectName()),
+//                StandardCharsets.UTF_8));
         fileItemDto.setDirectory(item.isDir());
         fileItemDto.setSize(item.size());
         fileItemDto.setViewSize(getViewSize(item));

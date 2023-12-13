@@ -80,7 +80,7 @@ public class SearchServiceImpl implements SearchService {
                     FileItemDto directory = new FileItemDto();
 
                     directory.setFullName(fullName);
-                    directory.setEncodedFullName(URLEncoder.encode(fullName, StandardCharsets.UTF_8));
+//                    directory.setEncodedFullName(URLEncoder.encode(fullName, StandardCharsets.UTF_8));
                     directory.setName(FilePathUtil.getName(fullName));
                     directory.setDirectory(true);
                     directory.setSize(0L);
