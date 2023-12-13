@@ -1,0 +1,32 @@
+@startuml
+title File download
+
+actor Client as Client
+
+box "Frontend"
+participant "Main Page"
+end box
+
+box "Backend"
+participant "Controller"
+participant "Service"
+participant "Repository"
+end box
+
+box "Storage"
+participant "S3 Storage (MinIO)"
+end box
+
+Client -> "Main Page" : click on file link
+"Main Page" -> Controller : HTTP GET request
+Controller -> Service : request
+Service -> Repository : request
+Repository -> "S3 Storage (MinIO)" : request
+"S3 Storage (MinIO)" -> Repository : response
+Repository -> Service : response
+Service -> Controller : response
+Controller -> "Main Page" : file as stream \napplication/octet-stream
+"Main Page" -> Client : file
+
+
+@enduml

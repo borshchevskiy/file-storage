@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>FilesList</title>
+</head>
+<body>
+<div th:fragment="filesList">
+    <table class="table table-hover align-middle caption-top w-100">
+        <thead class="table-dark">
+        <tr>
+            <th scope="col" style="width: 70%">File</th>
+            <th scope="col" style="width: 15%">Size</th>
+            <th scope="col" style="width: 15%" class="text-center">Action</th>
+        </tr>
+        </thead>
+        <tbody>
+        <!--Header row-->
+        <tr th:if="${#ctx.containsVariable('parentPath')}">
+            <td>
+                <a th:href="@{/(path=${parentPath})}" class="text-dark"><i class="bi bi-arrow-90deg-up">
+                    Back</i></a>
+            </td>
+            <td></td>
+            <td></td>
+        </tr>
+        <!--Main rows-->
+        <tr th:each="file:${filesList}">
+            <!--#1 Column - Name-->
+            <td>
+                <span th:if="${file.isDirectory()}">
+                        <i class="bi bi-folder"></i>
+                        <a th:href="@{/(path=${file.fullName})}"
+                           th:text="${file.name}"
+                           class="text-dark"> File name</a>
+                </span>
+
+                <span th:unless="${file.isDirectory()}">
+                        <i class="bi bi-file-earmark"></i>
+                        <a th:href="@{/files/download(path=${path},file=${file.name})}"
+                           th:text="${file.name}"
+                           download
+                           class="text-dark"> Directory name</a>
+                    </span>
+            </td>
+            <!--#2 Column - Size-->
+            <td><span th:text="${file.isDirectory()} ? '' : ${file.viewSize}"></span></td>
+            <!--#3 Column - Actions-->
+            <td>
+                <div class="d-flex justify-content-evenly">
+                    <!--Delete button-->
+                    <form th:action="@{${file.isDirectory() ? '/directories/delete' : '/files/delete'}}"
+                          id="deleteForm" method="post">
+                        <input type="hidden" name="path" th:value="${path}">
+                        <input type="hidden" name="name" th:value="${file.name}">
+                        <button class="btn btn-dark" type="submit"><i class="bi bi-trash"></i></button>
+                    </form>
+                    <!--Rename button-->
+                    <button type="button" class="btn btn-dark" data-bs-toggle="modal"
+                            th:data-bs-target="${file.isDirectory()
+                                        ? '#renameDirectoryModal'
+                                        : '#renameFileModal'}"
+                            th:data-bs-name="${file.name}"
+                            th:data-bs-path="${path}">
+                        <i class="bi bi-pencil-square"></i>
+                    </button>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

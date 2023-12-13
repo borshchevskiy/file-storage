@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>File Storage</title>
+    <th:block th:insert="~{fragments/common/fragment-assets :: common-assets}"></th:block>
+</head>
+<body class="min-vh-100 d-flex flex-column">
+<header>
+    <div th:insert="~{fragments/common/fragment-navbar :: navbar}"></div>
+</header>
+<div class="d-flex flex-column align-items-center justify-content-center flex-fill mx-auto w-75">
+    <div class="text-center mb-3">
+        <h3><i class="bi bi-emoji-frown"></i> Something went wrong!</h3>
+        <p th:text="${exceptionMessage}"></p>
+        <a class="text-dark" th:href="@{/}">Back to main page</a>
+    </div>
+</div>
+</body>
+</html>

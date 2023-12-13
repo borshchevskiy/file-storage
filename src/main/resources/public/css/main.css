@@ -1,0 +1,8 @@
+.form-control {
+    border-color: #212529;
+}
+
+.form-control:focus {
+    border-color: #212529;
+    box-shadow: 0 0 0 0.2rem rgba(55, 59, 62, 0.25)
+}

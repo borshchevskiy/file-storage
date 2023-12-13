@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Search</title>
+    <th:block th:insert="~{fragments/common/fragment-assets :: common-assets}"></th:block>
+</head>
+<body class="min-vh-100 d-flex flex-column">
+<header>
+    <div th:insert="~{fragments/common/fragment-navbar :: navbar}"></div>
+</header>
+<div class="d-flex flex-column align-items-center justify-content-center flex-fill">
+    <!--Search form-->
+    <div class="col-md-4 mb-3">
+        <form th:action="@{/search}" method="get" id="searchForm">
+            <label for="query" id="searchInputLabel">Search files and folders:</label>
+            <input class="form-control mb-3" type="text" id="query" name="query" required>
+            <div class="text-center">
+                <button class="btn btn-dark mb-3" type="submit" id="searchSubmit">
+                    <i class="bi bi-search mr-1"></i> Find
+                </button>
+            </div>
+        </form>
+    </div>
+    <!--Search results-->
+    <div class="col-md-6 mb-3">
+        <th:block th:insert="~{fragments/search/fragment-searchResults :: searchResults}"></th:block>
+    </div>
+</div>
+</body>
+</html>

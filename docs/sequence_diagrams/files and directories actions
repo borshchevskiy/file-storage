@@ -1,0 +1,35 @@
+@startuml
+title CRUD operations with files and directories (except file download)
+
+actor Client as Client
+
+box "Frontend"
+participant "Main Page"
+end box
+
+box "Backend"
+participant "Controller"
+participant "Service"
+participant "Repository"
+end box
+
+box "Storage"
+participant "S3 Storage (MinIO)"
+end box
+
+Client -> "Main Page" : perform action
+"Main Page" -> Controller : HTTP POST request \nwith FETCH API
+Controller -> Service : request
+Service -> Repository : request
+Repository -> "S3 Storage (MinIO)" : request
+"S3 Storage (MinIO)" -> Repository : response
+Repository -> Service : response
+Service -> Controller : response
+
+Controller -> "Main Page" : HTTP 300 response \n(redirect)
+"Main Page" -> Controller : HTTP GET request
+Controller -> "Main Page" : response
+"Main Page" -> "Main Page" : refresh content
+"Main Page" -> Client : view
+
+@enduml

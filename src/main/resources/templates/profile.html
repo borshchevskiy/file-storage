@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>File Storage - Profile</title>
+    <th:block th:insert="~{fragments/common/fragment-assets :: common-assets}"></th:block>
+</head>
+<body class="min-vh-100 d-flex flex-column">
+
+<header>
+    <div th:insert="~{fragments/common/fragment-navbar :: navbar}"></div>
+</header>
+<div class="d-flex flex-column align-items-center justify-content-center flex-fill">
+    <!-- Errors list -->
+    <th:block th:if="${errors}">
+        <div class="col-md-3 text-center mt-3">
+            <div class="alert alert-danger" role="alert">
+                <p th:each="error : ${errors}" th:text="${error}">Error message</p>
+            </div>
+        </div>
+    </th:block>
+    <!-- Successful profile update notifier -->
+    <th:block th:if="${isProfileUpdated}">
+        <div class="col-md-3 text-center mt-3">
+            <div class="alert alert-success" role="alert">
+                <p>Profile was successfully updated</p>
+            </div>
+        </div>
+    </th:block>
+    <!-- Successful password update notifier -->
+    <th:block th:if="${isPasswordUpdated}">
+        <div class="col-md-3 text-center mt-3">
+            <div class="alert alert-success" role="alert">
+                <p>Password was successfully updated</p>
+            </div>
+        </div>
+    </th:block>
+
+    <div class="col-md-3 text-center my-3">
+        <h3>Update profile</h3>
+    </div>
+    <div class="col-md-3 text-center mb-3">
+        <span>Fields marked with * can't be empty.</span>
+    </div>
+    <!-- Profile update form-->
+    <div class="col-md-3">
+        <form th:action="@{/profile/update}" method="post" th:object="${user}">
+            <div class="mb-3">
+                <label class="form-label" for="firstname">*Firstname:</label>
+                <input class="form-control" id="firstname" type="text" name="firstname"
+                       placeholder="James" th:value="*{firstname}">
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="lastname">Lastname:</label>
+                <input class="form-control" id="lastname" type="text" name="lastname"
+                       placeholder="Gosling" th:value="*{lastname}">
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="email">*Email:</label>
+                <input class="form-control" id="email" type="email" name="email"
+                       placeholder="example@example.com" th:value="*{email}" required/>
+                <div class="form-text">Enter valid email</div>
+            </div>
+
+            <div class="text-center mb-3">
+                <button class="btn btn-dark" type="submit">Update profile</button>
+            </div>
+        </form>
+    </div>
+    <div class="col-md-3">
+        <hr>
+    </div>
+    <div class="col-md-3 text-center mb-3">
+        <h3>Update password</h3>
+    </div>
+    <div class="col-md-3 text-center mb-3">
+        <span>Fields marked with * can't be empty.</span>
+    </div>
+    <!-- Password update form -->
+    <div class="col-md-3">
+        <form th:action="@{/profile/update/password}" method="post" th:object="${user}">
+            <div class="mb-3">
+                <label class="form-label" for="password">*Password:</label>
+                <input class="form-control" id="password" type="password" name="password"
+                       placeholder="********" required/>
+                <div class="form-text">Password must be at least 8 characters long</div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="passwordConfirmation">*Confirm password:</label>
+                <input class="form-control" id="passwordConfirmation" type="password"
+                       name="passwordConfirmation" placeholder="********" required/>
+                <div class="form-text">Confirmation must match password</div>
+            </div>
+            <div class="text-center mb-3">
+                <button class="btn btn-dark" type="submit">Update password</button>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+</html>

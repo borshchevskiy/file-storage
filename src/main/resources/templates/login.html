@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>File Storage - Login</title>
+    <th:block th:insert="~{fragments/common/fragment-assets :: common-assets}"></th:block>
+</head>
+<body class="min-vh-100 d-flex flex-column">
+<header>
+    <div th:insert="~{fragments/common/fragment-navbar :: navbar}"></div>
+</header>
+<div class="d-flex flex-column align-items-center justify-content-center flex-fill">
+    <div class="col-md-3 text-center mb-5">
+        <h3>Please, sign in</h3>
+    </div>
+    <!--Login form-->
+    <div class="col-md-3 mb-5">
+        <form th:action="@{/login}" method="post">
+            <div class="mb-3">
+                <label class="form-label" for="email">Email:</label><br>
+                <input class="form-control" id="email" type="email" name="email"
+                       placeholder="example@example.com" required/>
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="password">Password:</label><br>
+                <input class="form-control" id="password" type="password" name="password"
+                       placeholder="Password"/>
+            </div>
+            <div class="text-center">
+                <button class="btn btn-dark" type="submit">
+                    Log in
+                </button>
+            </div>
+        </form>
+    </div>
+    <!--Login errors list-->
+    <div class="col-md-3 text-center mb-5" th:if="${param.error}">
+        <div class="alert alert-danger" role="alert">
+            <p>Email or password is incorrect!</p>
+        </div>
+    </div>
+    <!--Navigation links-->
+    <div class="col-md-3 text-center mb-5">
+        <span>Don't have account? <a class="btn btn-dark" th:href="@{/registration}">Register!</a></span>
+    </div>
+    <div class="col-md-3 text-center mb-5">
+        <a class="btn btn-dark" th:href="@{/}">Back to main page</a>
+    </div>
+</div>
+</body>
+</html>

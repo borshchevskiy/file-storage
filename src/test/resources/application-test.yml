@@ -1,0 +1,45 @@
+spring:
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
+      enabled: false
+  thymeleaf:
+    encoding: UTF-8
+  datasource:
+#    url: jdbc:postgresql://localhost:5432/file_storage?currentSchema=file_storage
+#    username: postgres
+#    password: postgres
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+        hbm2ddl:
+          auto: validate
+    open-in-view: false
+  liquibase:
+    change-log: classpath:/db/changelog/db.changelog-master.yaml
+    enabled: true
+    default-schema: file_storage
+  session:
+    timeout: 86400
+  data:
+    redis:
+#      host: localhost
+#      port: 6379
+      password: redis
+minio:
+  url: http://localhost:9000
+  bucket: user-files
+  user: MINIO
+  password: MINIOMINIO
+
+app:
+  user-folder:
+    prefix: user-
+    suffix: -files
+
+
+
