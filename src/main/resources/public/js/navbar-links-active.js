@@ -1,6 +1,7 @@
 const currentPath = window.location.pathname;
-console.log(currentPath)
+
 let myClass;
+
 if (currentPath.startsWith("/search")) {
     myClass = document.getElementById("searchLink");
     myClass.setAttribute("class", "nav-link active");

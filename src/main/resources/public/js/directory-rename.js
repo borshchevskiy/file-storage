@@ -5,6 +5,7 @@ const renameDirectoryModalCloseButton = document.getElementById('renameDirectory
 renameDirectoryForm.addEventListener('submit', handleDirRename);
 renameDirectoryModal.addEventListener('show.bs.modal', addDataToModal);
 
+
 function addDataToModal(event) {
     const button = event.relatedTarget;
     // Extract info from data-bs-path and data-bs-name attributes
@@ -19,13 +20,8 @@ function addDataToModal(event) {
 
 async function handleDirRename(event) {
 
-    let response = await formSubmitFetch(event);
-    if (response.redirected) {
-        let redirectResponse = await fetch(response.url);
-        filesList.innerHTML = await redirectResponse.text();
-    } else {
-        document.body.innerHTML = await response.text();
-    }
+    let response = await formSubmit(event);
+    await handleFormSubmitResponse(response);
 
     renameDirectoryForm.reset();
     renameDirectoryModalCloseButton.click();

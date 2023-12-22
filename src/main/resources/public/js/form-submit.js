@@ -1,11 +1,9 @@
-async function formSubmitFetch(event) {
+async function formSubmit(event) {
     event.preventDefault();
 
     const form = event.currentTarget;
-    // const url = new URL(form.action);
-    // const formData = new FormData(form);
-    // formData.set('path', decodeURIComponent(formData.get('path')));
     const formDataParams =  new URLSearchParams(new FormData(form));
+
     formDataParams.set('path', decodeURIComponent(formDataParams.get('path')))
 
     const fetchOptions = {

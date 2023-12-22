@@ -20,14 +20,8 @@ function addDataToModal(event) {
 
 async function handleFileRename(event) {
 
-    let response = await formSubmitFetch(event);
-
-    if (response.redirected) {
-        let redirectResponse = await fetch(response.url);
-        filesList.innerHTML = await redirectResponse.text();
-    } else {
-        document.body.innerHTML = await response.text();
-    }
+    let response = await formSubmit(event);
+    await handleFormSubmitResponse(response);
 
     renameFileForm.reset();
     renameFileModalCloseButton.click();
