@@ -22,7 +22,6 @@ async function handleFileRename(event) {
 
     let response = await formSubmit(event);
     await handleFormSubmitResponse(response);
-
     renameFileForm.reset();
     renameFileModalCloseButton.click();
 }

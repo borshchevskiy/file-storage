@@ -42,7 +42,7 @@ public class FileServiceImpl implements FileService {
         List<Item> itemList = minioRepository.getItemsByPath(storagePath, false);
 
         return itemList.stream()
-                .map(fileItemMapper::mapToFileInfoDto)
+                .map(fileItemMapper::mapToFileItemDto)
                 .sorted(Comparator.comparing(FileItemDto::isDirectory).reversed()
                         .thenComparing(FileItemDto::getName))
                 .filter(dto -> !dto.getName().isBlank())

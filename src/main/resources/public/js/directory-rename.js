@@ -22,7 +22,6 @@ async function handleDirRename(event) {
 
     let response = await formSubmit(event);
     await handleFormSubmitResponse(response);
-
     renameDirectoryForm.reset();
     renameDirectoryModalCloseButton.click();
 }

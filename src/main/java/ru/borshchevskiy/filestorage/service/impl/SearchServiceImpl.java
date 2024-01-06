@@ -10,8 +10,6 @@ import ru.borshchevskiy.filestorage.service.SearchService;
 import ru.borshchevskiy.filestorage.util.FilePathUtil;
 import ru.borshchevskiy.filestorage.web.session.UserSessionData;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -80,7 +78,6 @@ public class SearchServiceImpl implements SearchService {
                     FileItemDto directory = new FileItemDto();
 
                     directory.setFullName(fullName);
-//                    directory.setEncodedFullName(URLEncoder.encode(fullName, StandardCharsets.UTF_8));
                     directory.setName(FilePathUtil.getName(fullName));
                     directory.setDirectory(true);
                     directory.setSize(0L);
@@ -102,11 +99,10 @@ public class SearchServiceImpl implements SearchService {
     private List<FileItemDto> searchFiles(String query, List<Item> allUserItems) {
         return allUserItems.stream()
                 .filter(item -> {
-//                    String name = FilePathUtil.getFileName(item.objectName());
                     String name = FilePathUtil.getName(item.objectName());
                     return name.contains(query);
                 })
-                .map(fileItemMapper::mapToFileInfoDto)
+                .map(fileItemMapper::mapToFileItemDto)
                 .toList();
     }
 }

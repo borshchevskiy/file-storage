@@ -1,5 +1,5 @@
-const token = $("meta[name='_csrf']").attr('content');
-const header = $("meta[name='_csrf_header']").attr('content');
+// const token = $("meta[name='_csrf']").attr('content');
+// const header = $("meta[name='_csrf_header']").attr('content');
 
 const filesInputForm = document.getElementById('filesInputForm');
 const filesInputButton = document.getElementById('filesInputSubmit');
@@ -70,9 +70,6 @@ async function handleFilesSubmit(event) {
 
     removeFileNames();
     enableFilesInputElements();
-
     await handleFormSubmitResponse(response);
-
-    let deleteForm = document.getElementById('deleteForm');
-    deleteForm.addEventListener('submit', handleDelete);
+    filesInputForm.reset();
 }

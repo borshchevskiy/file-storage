@@ -1,5 +1,5 @@
-const token = $("meta[name='_csrf']").attr('content');
-const header = $("meta[name='_csrf_header']").attr('content');
+// const token = $("meta[name='_csrf']").attr('content');
+// const header = $("meta[name='_csrf_header']").attr('content');
 
 const dirInputForm = document.getElementById('dirInputForm');
 const dirInputButton = document.getElementById('dirInputSubmit');
@@ -8,7 +8,7 @@ const dirInputLabel = document.getElementById('dirInputLabel');
 const dirInputLabelText = document.getElementById('dirInputLabelText');
 const dirSpinner = document.getElementById('dirSpinner');
 
-const filesList = document.getElementById('filesList');
+// const filesList = document.getElementById('filesList');
 
 dirInputForm.addEventListener('submit', handleDirSubmit)
 
@@ -78,11 +78,8 @@ async function handleDirSubmit(event) {
 
     let response = await fetch(url, fetchOptions);
 
+    dirInputForm.reset();
     removeDirNames();
     enableDirInputElements();
-
     await handleFormSubmitResponse(response);
-
-    let deleteForm = document.getElementById('deleteForm');
-    deleteForm.addEventListener('submit', handleDelete);
 }

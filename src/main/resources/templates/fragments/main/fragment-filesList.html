@@ -6,7 +6,7 @@
 </head>
 <body>
 <div th:fragment="filesList">
-    <table class="table table-hover align-middle caption-top w-100">
+    <table class="table table-hover align-middle caption-top w-100" id="filesListTable">
         <thead class="table-dark">
         <tr>
             <th scope="col" style="width: 70%">File</th>
@@ -50,7 +50,7 @@
                 <div class="d-flex justify-content-evenly">
                     <!--Delete button-->
                     <form th:action="@{${file.isDirectory() ? '/directories/delete' : '/files/delete'}}"
-                          id="deleteForm" method="post">
+                          class="deleteForm" method="post">
                         <input type="hidden" name="path" th:value="${path}">
                         <input type="hidden" name="name" th:value="${file.name}">
                         <button class="btn btn-dark" type="submit"><i class="bi bi-trash"></i></button>

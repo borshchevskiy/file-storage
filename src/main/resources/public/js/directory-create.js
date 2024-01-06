@@ -6,6 +6,5 @@ async function handleDirCreate(event) {
 
     let response = await formSubmit(event);
     await handleFormSubmitResponse(response);
-
     createDirectoryForm.reset();
 }

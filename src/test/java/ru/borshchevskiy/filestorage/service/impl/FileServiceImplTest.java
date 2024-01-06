@@ -92,12 +92,12 @@ class FileServiceImplTest {
                     .thenReturn(fileStoragePath);
         }
         doReturn(itemList).when(minioRepository).getItemsByPath(fileStoragePath, false);
-        doReturn(itemDto1).when(fileItemMapper).mapToFileInfoDto(item1);
-        doReturn(itemDto2).when(fileItemMapper).mapToFileInfoDto(item2);
-        doReturn(itemDto3).when(fileItemMapper).mapToFileInfoDto(item3);
-        doReturn(itemDto4).when(fileItemMapper).mapToFileInfoDto(item4);
-        doReturn(itemDto5).when(fileItemMapper).mapToFileInfoDto(item5);
-        doReturn(itemDto6).when(fileItemMapper).mapToFileInfoDto(item6);
+        doReturn(itemDto1).when(fileItemMapper).mapToFileItemDto(item1);
+        doReturn(itemDto2).when(fileItemMapper).mapToFileItemDto(item2);
+        doReturn(itemDto3).when(fileItemMapper).mapToFileItemDto(item3);
+        doReturn(itemDto4).when(fileItemMapper).mapToFileItemDto(item4);
+        doReturn(itemDto5).when(fileItemMapper).mapToFileItemDto(item5);
+        doReturn(itemDto6).when(fileItemMapper).mapToFileItemDto(item6);
 
         List<FileItemDto> actualList = fileService.getItemsByPath(path);
 

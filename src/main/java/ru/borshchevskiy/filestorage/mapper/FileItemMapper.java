@@ -7,9 +7,6 @@ import ru.borshchevskiy.filestorage.dto.file.FileItemDto;
 import ru.borshchevskiy.filestorage.util.FilePathUtil;
 import ru.borshchevskiy.filestorage.web.session.UserSessionData;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-
 /**
  * Class provides methods for converting objects from file storage to {@link FileItemDto} objects.
  */
@@ -29,13 +26,10 @@ public class FileItemMapper {
      * @param item Minio's {@link Item} instance
      * @return new {@link FileItemDto} based on {@link Item} instance received
      */
-    public FileItemDto mapToFileInfoDto(Item item) {
+    public FileItemDto mapToFileItemDto(Item item) {
         FileItemDto fileItemDto = new FileItemDto();
         fileItemDto.setFullName(FilePathUtil.removeUserDirectoryFromPath(userSessionData, item.objectName()));
         fileItemDto.setName(getName(item));
-//        fileItemDto.setEncodedFullName(URLEncoder.encode(
-//                FilePathUtil.removeUserDirectoryFromPath(userSessionData, item.objectName()),
-//                StandardCharsets.UTF_8));
         fileItemDto.setDirectory(item.isDir());
         fileItemDto.setSize(item.size());
         fileItemDto.setViewSize(getViewSize(item));

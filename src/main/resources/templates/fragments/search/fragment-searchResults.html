@@ -32,11 +32,11 @@
                     <!--#3 Column - Action-->
                     <td>
                         <a th:if="${file.isDirectory()}"
-                           th:href="@{/(path=${file.encodedFullName})}"
+                           th:href="@{/(path=${file.fullName})}"
                            class="text-dark">Go to directory</a>
 
                         <a th:unless="${file.isDirectory()}"
-                           th:href="@{/(path=${file.encodedFullName})}"
+                           th:href="@{/(path=${T(ru.borshchevskiy.filestorage.util.FilePathUtil).getParent(file.fullName)})}"
                            class="text-dark">Go to file location</a>
                     </td>
                 </tr>
