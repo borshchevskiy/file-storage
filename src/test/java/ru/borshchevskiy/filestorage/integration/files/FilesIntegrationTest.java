@@ -1,5 +1,6 @@
 package ru.borshchevskiy.filestorage.integration.files;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -28,6 +29,8 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatList;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -271,7 +274,7 @@ public class FilesIntegrationTest extends IntegrationTestBase {
     }
 
     @Test
-    @DisplayName("Test file delete - expect file is deleted")
+    @DisplayName("Test file delete - expect file is deleted and parent directory is present, despite it is empty")
     public void deleteFile() throws Exception {
         // Perform login to trigger creation of session scoped bean userSessionData
         mockMvc.perform(post("/login")
@@ -283,16 +286,11 @@ public class FilesIntegrationTest extends IntegrationTestBase {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/"));
 
-        final String path = "";
+        // Save the test file to storage with parent directory described in "path"
+        final String path = "dir/";
         final String fileName = "file.txt";
         final String fileData = "fileData";
-
-        // Save the test file to storage
         fileService.uploadFile(new ByteArrayInputStream(fileData.getBytes()), path, fileName);
-
-        List<FileItemDto> files = fileService.getItemsByPath(path);
-
-        assertThat(files.size()).isEqualTo(1);
 
         mockMvc.perform(post("/files/delete")
                         .session(session)
@@ -303,9 +301,14 @@ public class FilesIntegrationTest extends IntegrationTestBase {
                 .andExpect(model().attribute("path", path))
                 .andExpect(redirectedUrlPattern("/updateFilesList*"));
 
-        files = fileService.getItemsByPath(path);
+        // Check that file is absent, but its parent directory is present
+        List<FileItemDto> files = fileService.getItemsByPath(path);
+        List<FileItemDto> parentDirectory = fileService.getItemsByPath("");
 
         assertThatList(files).isEmpty();
+        assertThatList(parentDirectory).hasSize(1);
+        assertTrue(parentDirectory.get(0).isDirectory());
+        assertEquals(path, parentDirectory.get(0).getName());
     }
 }
 

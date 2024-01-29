@@ -33,7 +33,7 @@ public class MinioBucketHandler {
 
     /**
      * On {@link ContextRefreshedEvent} checks if Minio bucket with required name exists.
-     * If not - creates new bucket. Name is received from @link MinioProperties} instance.
+     * If not - creates new bucket. Name is received from {@link MinioProperties} instance.
      *
      * @see ContextRefreshedEvent
      * @see MinioProperties

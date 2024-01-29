@@ -3,6 +3,7 @@ package ru.borshchevskiy.filestorage.integration.search;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -12,6 +13,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import ru.borshchevskiy.filestorage.dto.file.FileItemDto;
@@ -20,6 +22,7 @@ import ru.borshchevskiy.filestorage.integration.IntegrationTestBase;
 import ru.borshchevskiy.filestorage.repository.MinioRepository;
 import ru.borshchevskiy.filestorage.service.DirectoryService;
 import ru.borshchevskiy.filestorage.service.FileService;
+import ru.borshchevskiy.filestorage.service.SearchService;
 import ru.borshchevskiy.filestorage.service.UserService;
 
 import java.io.ByteArrayInputStream;
@@ -60,7 +63,7 @@ public class SearchIntegrationTest extends IntegrationTestBase {
     private static final String PASSWORD_CONFIRMATION = "password";
 
     @BeforeEach
-    public void prepareContext() {
+    public void prepareContext() throws Exception {
         // Create a user
         UserRequestDto requestDto = new UserRequestDto();
         requestDto.setEmail(USERNAME);
@@ -85,6 +88,28 @@ public class SearchIntegrationTest extends IntegrationTestBase {
         jdbcTemplate.execute("ALTER SEQUENCE users_id_seq RESTART");
         jdbcTemplate.execute("ALTER SEQUENCE roles_user_id_seq RESTART");
         minioRepository.deleteDirectory("");
+    }
+
+    @Test
+    public void emptyQuerySearch() throws Exception {
+        // Perform login to trigger creation of session scoped bean userSessionData
+        mockMvc.perform(post("/login")
+                        .with(csrf())
+                        .session(session)
+                        .param("email", USERNAME)
+                        .param("password", PASSWORD)
+                        .contentType(MediaType.APPLICATION_FORM_URLENCODED))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/"));
+
+        String query = null;
+
+        mockMvc.perform(get("/search")
+                        .session(session)
+                        .param("query", query))
+                .andExpect(status().isOk())
+                .andExpect(view().name("search"))
+                .andExpect(model().attributeDoesNotExist("results"));
     }
 
     @Test
