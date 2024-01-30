@@ -78,7 +78,7 @@ public class FilesController {
             throw new NotMultipartRequestException("No file found within request!");
         }
 
-        JakartaServletFileUpload<DiskFileItem, DiskFileItemFactory> upload = new JakartaServletFileUpload<>();
+        JakartaServletFileUpload upload = new JakartaServletFileUpload<>();
 
         try {
             FileItemInputIterator itemIterator = upload.getItemIterator(request);

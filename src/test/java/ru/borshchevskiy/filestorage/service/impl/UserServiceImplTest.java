@@ -107,10 +107,10 @@ class UserServiceImplTest {
         @Test
         @DisplayName("Test when user doesn't exist - throws ResourceNotFoundException")
         void userDoesntExist() {
-            final String testEmail = "test@test.com";
+            final Long testId = Long.MAX_VALUE;
 
-            doReturn(Optional.empty()).when(userRepository).findByEmail(anyString());
-            assertThrows(ResourceNotFoundException.class, () -> userService.loadUserByUsername(testEmail));
+            doReturn(Optional.empty()).when(userRepository).findById(anyLong());
+            assertThrows(ResourceNotFoundException.class, () -> userService.findById(testId));
         }
     }
 
@@ -148,7 +148,7 @@ class UserServiceImplTest {
             final String testEmail = "test@test.com";
 
             doReturn(Optional.empty()).when(userRepository).findByEmail(anyString());
-            assertThrows(ResourceNotFoundException.class, () -> userService.loadUserByUsername(testEmail));
+            assertThrows(ResourceNotFoundException.class, () -> userService.findByEmail(testEmail));
         }
     }
 

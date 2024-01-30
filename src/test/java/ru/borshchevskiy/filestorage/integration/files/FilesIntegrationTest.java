@@ -177,18 +177,19 @@ public class FilesIntegrationTest extends IntegrationTestBase {
         final String responsePath = "";
         final String boundary = "q1w2e3r4t5y6u7i8o9";
         final String fileName = "file.txt";
-        final String contentType = MediaType.TEXT_PLAIN_VALUE;
+        final String requestContentType = MediaType.MULTIPART_FORM_DATA_VALUE;
+        final String fileContentType = MediaType.TEXT_PLAIN_VALUE;
 
         final String start = "--" + boundary +
                 "\r\n Content-Disposition: form-data; name=\"file\"; filename=\"" + fileName + "\"\r\n"
-                + "Content-type: " + contentType + "\r\n\r\n";
+                + "Content-type: " + fileContentType + "\r\n\r\n";
         final String end = "\r\n--" + boundary + "--";
         final String fileData = "fileData";
 
         final byte[] body = (start + fileData + end).getBytes();
 
         mockMvc.perform(post("/files/upload")
-                        .contentType("multipart/form-data; boundary=" + boundary)
+                        .contentType(requestContentType + "; boundary=" + boundary)
                         .with(csrf().asHeader())
                         .content(body)
                         .session(session)
@@ -204,10 +205,9 @@ public class FilesIntegrationTest extends IntegrationTestBase {
         assertThat(files.get(0).getSize()).isEqualTo(fileData.getBytes().length);
     }
 
-
     @Test
-    @DisplayName("Test file rename - expect file has new name")
-    public void renameFile() throws Exception {
+    @DisplayName("Test file with extension renaming - expect file has new name and extension is preserved")
+    public void renameFileWithExtension() throws Exception {
         final String path = "";
         final String fileName = "file.txt";
         final String fileData = "fileData";
@@ -234,8 +234,36 @@ public class FilesIntegrationTest extends IntegrationTestBase {
     }
 
     @Test
-    @DisplayName("Test file delete - expect file is deleted and parent directory is present, despite it is empty")
-    public void deleteFile() throws Exception {
+    @DisplayName("Test file without extension renaming - expect file has new name")
+    public void renameFileWithoutExtension() throws Exception {
+        final String path = "";
+        final String fileName = "file";
+        final String fileData = "fileData";
+        final String newFileName = "newFileName";
+
+        fileService.uploadFile(new ByteArrayInputStream(fileData.getBytes()), path, fileName);
+
+        mockMvc.perform(post("/files/rename")
+                        .session(session)
+                        .with(csrf())
+                        .param("path", path)
+                        .param("oldName", fileName)
+                        .param("newName", newFileName))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(model().attribute("path", path))
+                .andExpect(redirectedUrlPattern("/updateFilesList*"));
+
+        final List<FileItemDto> files = fileService.getItemsByPath(path);
+
+        assertThat(files.size()).isEqualTo(1);
+        assertThat(files.get(0).getName()).isEqualTo(newFileName);
+        assertThat(files.get(0).getSize()).isEqualTo(fileData.getBytes().length);
+    }
+
+    @Test
+    @DisplayName("Test all files delete in directory" +
+            " - expect file is deleted and parent directory is present, despite it is empty")
+    public void deleteAllFilesInDir() throws Exception {
         // Save the test file to storage with parent directory described in "path"
         final String path = "dir/";
         final String fileName = "file.txt";
@@ -259,6 +287,92 @@ public class FilesIntegrationTest extends IntegrationTestBase {
         assertThatList(parentDirectory).hasSize(1);
         assertTrue(parentDirectory.get(0).isDirectory());
         assertEquals(path, parentDirectory.get(0).getName());
+    }
+
+    @Test
+    @DisplayName("Test all files delete in root" +
+            " - expect file is deleted and root is empty")
+    public void deleteAllFilesInRoot() throws Exception {
+        // Save the test file to storage with parent directory described in "path"
+        final String path = "";
+        final String fileName = "file.txt";
+        final String fileData = "fileData";
+        fileService.uploadFile(new ByteArrayInputStream(fileData.getBytes()), path, fileName);
+
+        mockMvc.perform(post("/files/delete")
+                        .session(session)
+                        .with(csrf())
+                        .param("path", path)
+                        .param("name", fileName))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(model().attribute("path", path))
+                .andExpect(redirectedUrlPattern("/updateFilesList*"));
+
+        // Check that file is absent, but its parent directory is present
+        List<FileItemDto> files = fileService.getItemsByPath(path);
+
+        assertThatList(files).isEmpty();
+    }
+
+    @Test
+    @DisplayName("Test some files deleted in directory" +
+            " - expect file is deleted and parent directory with other file is present")
+    public void deleteSomeFilesInDirectory() throws Exception {
+        // Save the test file to storage with parent directory described in "path"
+        final String path = "dir/";
+        final String fileName = "file.txt";
+        final String fileData = "fileData";
+        final String anotherFileName = "anotherFile.txt";
+        final String anotherFileData = "anotherFileData";
+        fileService.uploadFile(new ByteArrayInputStream(fileData.getBytes()), path, fileName);
+        fileService.uploadFile(new ByteArrayInputStream(anotherFileData.getBytes()), path, anotherFileName);
+
+        mockMvc.perform(post("/files/delete")
+                        .session(session)
+                        .with(csrf())
+                        .param("path", path)
+                        .param("name", fileName))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(model().attribute("path", path))
+                .andExpect(redirectedUrlPattern("/updateFilesList*"));
+
+        // Check that file is absent, but its parent directory is present
+        List<FileItemDto> files = fileService.getItemsByPath(path);
+        List<FileItemDto> parentDirectory = fileService.getItemsByPath("");
+
+        assertThatList(files).hasSize(1);
+        assertEquals(anotherFileName, files.get(0).getName());
+        assertThatList(parentDirectory).hasSize(1);
+        assertEquals(path, parentDirectory.get(0).getName());
+    }
+
+    @Test
+    @DisplayName("Test some files deleted in root" +
+            " - expect file is deleted and other file is present")
+    public void deleteSomeFilesInRoot() throws Exception {
+        // Save the test file to storage with parent directory described in "path"
+        final String path = "";
+        final String fileName = "file.txt";
+        final String fileData = "fileData";
+        final String anotherFileName = "anotherFile.txt";
+        final String anotherFileData = "anotherFileData";
+        fileService.uploadFile(new ByteArrayInputStream(fileData.getBytes()), path, fileName);
+        fileService.uploadFile(new ByteArrayInputStream(anotherFileData.getBytes()), path, anotherFileName);
+
+        mockMvc.perform(post("/files/delete")
+                        .session(session)
+                        .with(csrf())
+                        .param("path", path)
+                        .param("name", fileName))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(model().attribute("path", path))
+                .andExpect(redirectedUrlPattern("/updateFilesList*"));
+
+        // Check that file is absent, but its parent directory is present
+        List<FileItemDto> files = fileService.getItemsByPath(path);
+
+        assertThatList(files).hasSize(1);
+        assertEquals(anotherFileName, files.get(0).getName());
     }
 }
 

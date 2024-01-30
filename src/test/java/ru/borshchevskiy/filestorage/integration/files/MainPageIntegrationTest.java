@@ -2,6 +2,7 @@ package ru.borshchevskiy.filestorage.integration.files;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -88,6 +89,8 @@ public class MainPageIntegrationTest extends IntegrationTestBase {
     }
 
     @Test
+    @DisplayName("Get main page with empty 'path' param - returned 'main' template " +
+            "and 'parentPath param is absent")
     public void getMainPage() throws Exception {
         final String path = "";
 
@@ -115,6 +118,54 @@ public class MainPageIntegrationTest extends IntegrationTestBase {
     }
 
     @Test
+    @DisplayName("Get main page with 'path' param - returned 'main' template " +
+            "and 'parentPath param is present")
+    public void getMainPageWithPath() throws Exception {
+        final String path = "dir/";
+
+        // Create and save mock files
+        MockMultipartFile multipartFile1 = new MockMultipartFile("file1", "file1.txt",
+                MediaType.MULTIPART_FORM_DATA_VALUE, "file1".getBytes());
+        MockMultipartFile multipartFile2 = new MockMultipartFile("file2", "file2.txt",
+                MediaType.MULTIPART_FORM_DATA_VALUE, "file2".getBytes());
+        MockMultipartFile multipartFile3 = new MockMultipartFile("file3", "file3.txt",
+                MediaType.MULTIPART_FORM_DATA_VALUE, "file3".getBytes());
+
+        fileService.uploadFile(multipartFile1.getInputStream(), path, multipartFile1.getOriginalFilename());
+        fileService.uploadFile(multipartFile2.getInputStream(), path, multipartFile2.getOriginalFilename());
+        fileService.uploadFile(multipartFile3.getInputStream(), path, multipartFile3.getOriginalFilename());
+
+        mockMvc.perform(get("/")
+                        .session(session)
+                        .param("path", path))
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(view().name("main"))
+                .andExpect(model().attributeExists("path"))
+                .andExpect(model().attributeExists("parentPath"))
+                .andExpect(model().attributeExists("breadcrumbs"))
+                .andExpect(model().attribute("filesList", hasSize(3)));
+    }
+
+    @Test
+    @DisplayName("Get main page without user - returned 'main' template without any " +
+            "additional params (e.g. filesList)")
+    public void getMainPageWithoutUser() throws Exception {
+        final String path = "dir/";
+
+        //Perform request without session
+        mockMvc.perform(get("/")
+                        .param("path", path))
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(view().name("main"))
+                .andExpect(model().attributeDoesNotExist("path"))
+                .andExpect(model().attributeDoesNotExist("parentPath"))
+                .andExpect(model().attributeDoesNotExist("breadcrumbs"))
+                .andExpect(model().attributeDoesNotExist("filesList"));
+    }
+
+    @Test
+    @DisplayName("Update list of files with empty 'path' param - returned 'filesList' fragment " +
+            "and 'parentPath param is absent")
     public void updateFileList() throws Exception {
         final String path = "";
 
@@ -138,5 +189,33 @@ public class MainPageIntegrationTest extends IntegrationTestBase {
                 .andExpect(model().attributeExists("path"))
                 .andExpect(model().attribute("filesList", hasSize(3)))
                 .andExpect(model().attributeDoesNotExist("parentPath"));
+    }
+
+    @Test
+    @DisplayName("Update list of files with existing 'path' param - returned 'filesList' fragment " +
+            "and 'parentPath param is present")
+    public void updateFileListWithPath() throws Exception {
+        final String path = "dir/";
+
+        // Create and save mock files
+        MockMultipartFile multipartFile1 = new MockMultipartFile("file1", "file1.txt",
+                MediaType.MULTIPART_FORM_DATA_VALUE, "file1".getBytes());
+        MockMultipartFile multipartFile2 = new MockMultipartFile("file2", "file2.txt",
+                MediaType.MULTIPART_FORM_DATA_VALUE, "file2".getBytes());
+        MockMultipartFile multipartFile3 = new MockMultipartFile("file3", "file3.txt",
+                MediaType.MULTIPART_FORM_DATA_VALUE, "file3".getBytes());
+
+        fileService.uploadFile(multipartFile1.getInputStream(), path, multipartFile1.getOriginalFilename());
+        fileService.uploadFile(multipartFile2.getInputStream(), path, multipartFile2.getOriginalFilename());
+        fileService.uploadFile(multipartFile3.getInputStream(), path, multipartFile3.getOriginalFilename());
+
+        mockMvc.perform(get("/updateFilesList")
+                        .session(session)
+                        .param("path", path))
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(view().name("fragments/main/fragment-filesList :: filesList"))
+                .andExpect(model().attributeExists("path"))
+                .andExpect(model().attributeExists("parentPath"))
+                .andExpect(model().attribute("filesList", hasSize(3)));
     }
 }

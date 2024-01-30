@@ -25,6 +25,7 @@ public class MainPageController {
 
     /**
      * Returns main page view.
+     * If path parameter is not empty, parentPath parameter is calculated for page navigation purposes.
      * @param path path in user's storage which content should be displayed.
      * @param model MVC {@link Model}.
      * @param user current {@link org.springframework.security.core.userdetails.User}.
@@ -51,6 +52,7 @@ public class MainPageController {
 
     /**
      * Updates files' list on main page without refreshing entire page.
+     * If path parameter is not empty, parentPath parameter is calculated for page navigation purposes.
      * @param path storage path which content should be viewed.
      * @param model MVC {@link Model}.
      * @return fragment to be updated on main page.

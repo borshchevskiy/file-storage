@@ -1,9 +1,6 @@
 package ru.borshchevskiy.filestorage.integration.directories;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -26,6 +23,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatList;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -149,8 +147,9 @@ public class DirectoriesIntegrationTest extends IntegrationTestBase {
     }
 
     @Test
-    @DisplayName("Test directory delete - expect directory is deleted")
-    public void deleteFile() throws Exception {
+    @DisplayName("Test directory delete " +
+            "- expect directory is deleted and parent directory is still present despite it is empty")
+    public void deleteAllDirectoriesInParentDirectory() throws Exception {
         final String path = "parentDir/";
         final String dirName = "dir";
 
@@ -158,10 +157,10 @@ public class DirectoriesIntegrationTest extends IntegrationTestBase {
         directoryService.createDirectory(path, dirName);
 
         //Assert that directory is created with required name
-        List<FileItemDto> filesByPath = fileService.getItemsByPath(path);
-        assertThatList(filesByPath).hasSize(1);
-        assertThat(filesByPath.get(0).isDirectory()).isTrue();
-        assertThat(filesByPath.get(0).getName()).isEqualTo(dirName + "/");
+        List<FileItemDto> itemsByPath = fileService.getItemsByPath(path);
+        assertThatList(itemsByPath).hasSize(1);
+        assertThat(itemsByPath.get(0).isDirectory()).isTrue();
+        assertThat(itemsByPath.get(0).getName()).isEqualTo(dirName + "/");
 
         mockMvc.perform(post("/directories/delete")
                         .session(session)
@@ -172,8 +171,106 @@ public class DirectoriesIntegrationTest extends IntegrationTestBase {
                 .andExpect(model().attribute("path", path))
                 .andExpect(redirectedUrlPattern("/updateFilesList*"));
 
-        List<FileItemDto> files = fileService.getItemsByPath(path);
-        assertThatList(files).isEmpty();
+        //Check that no directory is found
+        List<FileItemDto> items = fileService.getItemsByPath(path);
+        assertThatList(items).isEmpty();
+
+        //Check that parent directory is still present
+        List<FileItemDto> parentItems = fileService.getItemsByPath("");
+        assertThatList(parentItems).hasSize(1);
+        assertEquals(path, parentItems.get(0).getName());
+    }
+
+    @Test
+    @DisplayName("Test directory delete - expect directory is deleted and parent directory with other items is present")
+    public void deleteSomeDirectoriesInParentDirectory() throws Exception {
+        final String path = "parentDir/";
+        final String dirName = "dir";
+        final String anotherDirName = "anotherDir";
+
+        // Create directories in path
+        directoryService.createDirectory(path, dirName);
+        directoryService.createDirectory(path, anotherDirName);
+
+        //Assert that directory is created with required name
+        List<FileItemDto> itemsByPath = fileService.getItemsByPath(path);
+        assertThatList(itemsByPath).hasSize(2);
+
+        mockMvc.perform(post("/directories/delete")
+                        .session(session)
+                        .with(csrf())
+                        .param("path", path)
+                        .param("name", dirName + "/"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(model().attribute("path", path))
+                .andExpect(redirectedUrlPattern("/updateFilesList*"));
+
+        //Check that no directory is found
+        List<FileItemDto> items = fileService.getItemsByPath(path);
+        assertThatList(items).hasSize(1);
+        assertEquals(anotherDirName + "/", items.get(0).getName());
+
+        //Check that parent directory is still present
+        List<FileItemDto> parentItems = fileService.getItemsByPath("");
+        assertThatList(parentItems).hasSize(1);
+        assertEquals(path, parentItems.get(0).getName());
+    }
+
+    @Test
+    @DisplayName("Test directory delete in root - expect directory is deleted")
+    public void deleteAllDirectoryInRoot() throws Exception {
+        final String path = "";
+        final String dirName = "dir";
+
+        // Create directories in path
+        directoryService.createDirectory(path, dirName);
+
+        //Assert that directory is created with required name
+        List<FileItemDto> itemsByPath = fileService.getItemsByPath(path);
+        assertThatList(itemsByPath).hasSize(1);
+
+        mockMvc.perform(post("/directories/delete")
+                        .session(session)
+                        .with(csrf())
+                        .param("path", path)
+                        .param("name", dirName + "/"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(model().attribute("path", path))
+                .andExpect(redirectedUrlPattern("/updateFilesList*"));
+
+        //Check that no directory is found
+        List<FileItemDto> items = fileService.getItemsByPath(path);
+        assertThatList(items).hasSize(0);
+    }
+
+    @Test
+    @DisplayName("Test directory delete in root - expect directory is deleted")
+    public void deleteOneDirectoryInRoot() throws Exception {
+        final String path = "";
+        final String dirName = "dir";
+        final String anotherDirName = "anotherDir";
+
+        // Create directories in path
+        directoryService.createDirectory(path, dirName);
+        directoryService.createDirectory(path, anotherDirName);
+
+        //Assert that directory is created with required name
+        List<FileItemDto> itemsByPath = fileService.getItemsByPath(path);
+        assertThatList(itemsByPath).hasSize(2);
+
+        mockMvc.perform(post("/directories/delete")
+                        .session(session)
+                        .with(csrf())
+                        .param("path", path)
+                        .param("name", dirName + "/"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(model().attribute("path", path))
+                .andExpect(redirectedUrlPattern("/updateFilesList*"));
+
+        //Check that no directory is found
+        List<FileItemDto> items = fileService.getItemsByPath(path);
+        assertThatList(items).hasSize(1);
+        assertEquals(anotherDirName + "/", items.get(0).getName());
     }
 }
 

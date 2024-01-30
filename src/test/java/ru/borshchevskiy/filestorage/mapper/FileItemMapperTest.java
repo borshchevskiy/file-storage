@@ -21,7 +21,7 @@ class FileItemMapperTest {
     UserSessionData userSessionData;
     @Mock
     Item item;
-    private final Long BYTES_SIZE = 10240000000L;
+    private final Long BYTES_SIZE = 10_240_000_000L;
     private final String BYTES_SIZE_TEXT = "9,5 GB";
 
 

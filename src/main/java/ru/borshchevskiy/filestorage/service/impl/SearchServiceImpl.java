@@ -70,9 +70,9 @@ public class SearchServiceImpl implements SearchService {
 
         for (String path : pathsContainingQuery) {
             StringBuilder directoryPath = new StringBuilder();
-            for (String s : path.split("/")) {
-                directoryPath.append(s).append("/");
-                if (s.contains(query)) {
+            for (String pathPart : path.split("/")) {
+                directoryPath.append(pathPart).append("/");
+                if (pathPart.contains(query)) {
 
                     String fullName = directoryPath.toString();
                     FileItemDto directory = new FileItemDto();
