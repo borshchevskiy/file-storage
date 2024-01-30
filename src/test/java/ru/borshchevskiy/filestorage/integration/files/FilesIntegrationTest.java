@@ -62,7 +62,7 @@ public class FilesIntegrationTest extends IntegrationTestBase {
     private static final String PASSWORD_CONFIRMATION = "password";
 
     @BeforeEach
-    public void prepareContext() {
+    public void prepareContext() throws Exception {
         UserRequestDto requestDto = new UserRequestDto();
         requestDto.setEmail(USERNAME);
         requestDto.setFirstname(FIRSTNAME);
@@ -76,6 +76,16 @@ public class FilesIntegrationTest extends IntegrationTestBase {
                 .webAppContextSetup(webApplicationContext)
                 .apply(springSecurity())
                 .build();
+
+        // Perform login to trigger creation of session scoped bean userSessionData
+        mockMvc.perform(post("/login")
+                        .with(csrf())
+                        .session(session)
+                        .param("email", USERNAME)
+                        .param("password", PASSWORD)
+                        .contentType(MediaType.APPLICATION_FORM_URLENCODED))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/"));
     }
 
     @AfterEach
@@ -90,16 +100,6 @@ public class FilesIntegrationTest extends IntegrationTestBase {
     @Test
     @DisplayName(value = "Test file download - expect file is saved")
     public void download() throws Exception {
-        // Perform login to trigger creation of session scoped bean userSessionData
-        mockMvc.perform(post("/login")
-                        .with(csrf())
-                        .session(session)
-                        .param("email", USERNAME)
-                        .param("password", PASSWORD)
-                        .contentType(MediaType.APPLICATION_FORM_URLENCODED))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/"));
-
         final String path = "";
         final String fileName = "file.txt";
         final String fileData = "fileData";
@@ -124,16 +124,6 @@ public class FilesIntegrationTest extends IntegrationTestBase {
     @Test
     @DisplayName("Test file upload with wrong Content-Type header - expect error 400")
     public void uploadNotMultipart() throws Exception {
-        // Perform login to trigger creation of session scoped bean userSessionData
-        mockMvc.perform(post("/login")
-                        .with(csrf())
-                        .session(session)
-                        .param("email", USERNAME)
-                        .param("password", PASSWORD)
-                        .contentType(MediaType.APPLICATION_FORM_URLENCODED))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/"));
-
         final String requestPath = "";
         final String boundary = "q1w2e3r4t5y6u7i8o9";
         final String fileName = "file.txt";
@@ -160,16 +150,6 @@ public class FilesIntegrationTest extends IntegrationTestBase {
     @Test
     @DisplayName("Test file upload without file - expect nothing is saved")
     public void uploadNothing() throws Exception {
-        // Perform login to trigger creation of session scoped bean userSessionData
-        mockMvc.perform(post("/login")
-                        .with(csrf())
-                        .session(session)
-                        .param("email", USERNAME)
-                        .param("password", PASSWORD)
-                        .contentType(MediaType.APPLICATION_FORM_URLENCODED))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/"));
-
         final String requestPath = "";
         final String responsePath = "";
         final String boundary = "q1w2e3r4t5y6u7i8o9";
@@ -193,16 +173,6 @@ public class FilesIntegrationTest extends IntegrationTestBase {
     @Test
     @DisplayName("Test file upload - expect file is uploaded")
     public void upload() throws Exception {
-        // Perform login to trigger creation of session scoped bean userSessionData
-        mockMvc.perform(post("/login")
-                        .with(csrf())
-                        .session(session)
-                        .param("email", USERNAME)
-                        .param("password", PASSWORD)
-                        .contentType(MediaType.APPLICATION_FORM_URLENCODED))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/"));
-
         final String requestPath = "";
         final String responsePath = "";
         final String boundary = "q1w2e3r4t5y6u7i8o9";
@@ -238,16 +208,6 @@ public class FilesIntegrationTest extends IntegrationTestBase {
     @Test
     @DisplayName("Test file rename - expect file has new name")
     public void renameFile() throws Exception {
-        // Perform login to trigger creation of session scoped bean userSessionData
-        mockMvc.perform(post("/login")
-                        .with(csrf())
-                        .session(session)
-                        .param("email", USERNAME)
-                        .param("password", PASSWORD)
-                        .contentType(MediaType.APPLICATION_FORM_URLENCODED))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/"));
-
         final String path = "";
         final String fileName = "file.txt";
         final String fileData = "fileData";
@@ -276,16 +236,6 @@ public class FilesIntegrationTest extends IntegrationTestBase {
     @Test
     @DisplayName("Test file delete - expect file is deleted and parent directory is present, despite it is empty")
     public void deleteFile() throws Exception {
-        // Perform login to trigger creation of session scoped bean userSessionData
-        mockMvc.perform(post("/login")
-                        .with(csrf())
-                        .session(session)
-                        .param("email", USERNAME)
-                        .param("password", PASSWORD)
-                        .contentType(MediaType.APPLICATION_FORM_URLENCODED))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/"));
-
         // Save the test file to storage with parent directory described in "path"
         final String path = "dir/";
         final String fileName = "file.txt";
@@ -295,7 +245,7 @@ public class FilesIntegrationTest extends IntegrationTestBase {
         mockMvc.perform(post("/files/delete")
                         .session(session)
                         .with(csrf())
-                        .param("path", path )
+                        .param("path", path)
                         .param("name", fileName))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(model().attribute("path", path))

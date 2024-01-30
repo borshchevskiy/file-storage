@@ -52,7 +52,7 @@ public class MainPageIntegrationTest extends IntegrationTestBase {
     private static final String PASSWORD_CONFIRMATION = "password";
 
     @BeforeEach
-    public void prepareContext() {
+    public void prepareContext() throws Exception {
         mockMvc = MockMvcBuilders
                 .webAppContextSetup(webApplicationContext)
                 .apply(springSecurity())
@@ -66,6 +66,16 @@ public class MainPageIntegrationTest extends IntegrationTestBase {
         requestDto.setPassword(PASSWORD);
         requestDto.setPasswordConfirmation(PASSWORD_CONFIRMATION);
         userService.create(requestDto);
+
+        // Perform login to trigger creation of session scoped bean userSessionData
+        mockMvc.perform(post("/login")
+                        .with(csrf())
+                        .session(session)
+                        .param("email", USERNAME)
+                        .param("password", PASSWORD)
+                        .contentType(MediaType.APPLICATION_FORM_URLENCODED))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/"));
     }
 
     @AfterEach
@@ -80,16 +90,6 @@ public class MainPageIntegrationTest extends IntegrationTestBase {
     @Test
     public void getMainPage() throws Exception {
         final String path = "";
-
-        // Perform login to trigger creation of session scoped bean userSessionData
-        mockMvc.perform(post("/login")
-                        .with(csrf())
-                        .session(session)
-                        .param("email", USERNAME)
-                        .param("password", PASSWORD)
-                        .contentType(MediaType.APPLICATION_FORM_URLENCODED))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/"));
 
         // Create and save mock files
         MockMultipartFile multipartFile1 = new MockMultipartFile("file1", "file1.txt",
@@ -117,16 +117,6 @@ public class MainPageIntegrationTest extends IntegrationTestBase {
     @Test
     public void updateFileList() throws Exception {
         final String path = "";
-
-        // Perform login to trigger creation of session scoped bean userSessionData
-        mockMvc.perform(post("/login")
-                        .with(csrf())
-                        .session(session)
-                        .param("email", USERNAME)
-                        .param("password", PASSWORD)
-                        .contentType(MediaType.APPLICATION_FORM_URLENCODED))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/"));
 
         // Create and save mock files
         MockMultipartFile multipartFile1 = new MockMultipartFile("file1", "file1.txt",

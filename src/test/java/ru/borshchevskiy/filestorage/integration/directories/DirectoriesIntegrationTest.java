@@ -58,7 +58,7 @@ public class DirectoriesIntegrationTest extends IntegrationTestBase {
     private static final String PASSWORD_CONFIRMATION = "password";
 
     @BeforeEach
-    public void prepareContext() {
+    public void prepareContext() throws Exception {
         UserRequestDto requestDto = new UserRequestDto();
         requestDto.setEmail(USERNAME);
         requestDto.setFirstname(FIRSTNAME);
@@ -72,6 +72,16 @@ public class DirectoriesIntegrationTest extends IntegrationTestBase {
                 .webAppContextSetup(webApplicationContext)
                 .apply(springSecurity())
                 .build();
+
+        //         Perform login to trigger creation of session scoped bean userSessionData
+        mockMvc.perform(post("/login")
+                        .with(csrf())
+                        .session(session)
+                        .param("email", USERNAME)
+                        .param("password", PASSWORD)
+                        .contentType(MediaType.APPLICATION_FORM_URLENCODED))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/"));
     }
 
     @AfterEach
@@ -86,16 +96,6 @@ public class DirectoriesIntegrationTest extends IntegrationTestBase {
     @Test
     @DisplayName("Test new empty directory creation - new empty dir is created")
     public void createNewDir() throws Exception {
-//         Perform login to trigger creation of session scoped bean userSessionData
-        mockMvc.perform(post("/login")
-                        .with(csrf())
-                        .session(session)
-                        .param("email", USERNAME)
-                        .param("password", PASSWORD)
-                        .contentType(MediaType.APPLICATION_FORM_URLENCODED))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/"));
-
         final String path = "";
         final String newDirectoryName = "new dir";
 
@@ -109,7 +109,7 @@ public class DirectoriesIntegrationTest extends IntegrationTestBase {
                 .andExpect(model().attribute("path", path));
 
         List<FileItemDto> filesByPath = fileService.getItemsByPath(path);
-        
+
         assertThatList(filesByPath).hasSize(1);
         assertThat(filesByPath.get(0).isDirectory()).isTrue();
         assertThat(filesByPath.get(0).getName()).isEqualTo(newDirectoryName + "/");
@@ -118,16 +118,6 @@ public class DirectoriesIntegrationTest extends IntegrationTestBase {
     @Test
     @DisplayName("Test directory rename - expect directory has new name")
     public void renameDirectory() throws Exception {
-        // Perform login to trigger creation of session scoped bean userSessionData
-        mockMvc.perform(post("/login")
-                        .with(csrf())
-                        .session(session)
-                        .param("email", USERNAME)
-                        .param("password", PASSWORD)
-                        .contentType(MediaType.APPLICATION_FORM_URLENCODED))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/"));
-
         final String path = "";
         final String oldDirName = "dir";
         final String newDirName = "newDirName";
@@ -161,16 +151,6 @@ public class DirectoriesIntegrationTest extends IntegrationTestBase {
     @Test
     @DisplayName("Test directory delete - expect directory is deleted")
     public void deleteFile() throws Exception {
-        // Perform login to trigger creation of session scoped bean userSessionData
-        mockMvc.perform(post("/login")
-                        .with(csrf())
-                        .session(session)
-                        .param("email", USERNAME)
-                        .param("password", PASSWORD)
-                        .contentType(MediaType.APPLICATION_FORM_URLENCODED))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/"));
-
         final String path = "parentDir/";
         final String dirName = "dir";
 

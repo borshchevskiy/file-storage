@@ -48,7 +48,7 @@ public class UserIntegrationTest extends IntegrationTestBase {
     private static final String PASSWORD_CONFIRMATION = "password";
 
     @BeforeEach
-    public void prepareContext() {
+    public void prepareContext() throws Exception {
         UserRequestDto requestDto = new UserRequestDto();
         requestDto.setEmail(USERNAME);
         requestDto.setFirstname(FIRSTNAME);
@@ -62,6 +62,16 @@ public class UserIntegrationTest extends IntegrationTestBase {
                 .webAppContextSetup(webApplicationContext)
                 .apply(springSecurity())
                 .build();
+
+        // Perform login to trigger creation of session scoped bean userSessionData
+        mockMvc.perform(post("/login")
+                        .with(csrf())
+                        .session(session)
+                        .param("email", USERNAME)
+                        .param("password", PASSWORD)
+                        .contentType(MediaType.APPLICATION_FORM_URLENCODED))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/"));
     }
 
     @AfterEach
@@ -75,15 +85,6 @@ public class UserIntegrationTest extends IntegrationTestBase {
     @Test
     @DisplayName("Get profile page - response status is 200 and 'profile' page is received")
     public void getProfile() throws Exception {
-        // Perform login
-        mockMvc.perform(post("/login")
-                        .with(csrf())
-                        .session(session)
-                        .param("email", USERNAME)
-                        .param("password", PASSWORD)
-                        .contentType(MediaType.APPLICATION_FORM_URLENCODED))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/"));
 
         mockMvc.perform(get("/profile")
                         .session(session))
@@ -102,16 +103,6 @@ public class UserIntegrationTest extends IntegrationTestBase {
         UserResponseDto expectedUserParam = userService.findByEmail(USERNAME);
         expectedUserParam.setFirstname(newFirstname);
         expectedUserParam.setLastname(newLastname);
-
-        // Perform login to trigger creation of session scoped bean userSessionData
-        mockMvc.perform(post("/login")
-                        .with(csrf())
-                        .session(session)
-                        .param("email", USERNAME)
-                        .param("password", PASSWORD)
-                        .contentType(MediaType.APPLICATION_FORM_URLENCODED))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/"));
 
         // Perform profile update
         mockMvc.perform(post("/profile/update")
@@ -144,16 +135,6 @@ public class UserIntegrationTest extends IntegrationTestBase {
         expectedUserParam.setLastname(newLastname);
         expectedUserParam.setEmail(USERNAME);
 
-        // Perform login to trigger creation of session scoped bean userSessionData
-        mockMvc.perform(post("/login")
-                        .with(csrf())
-                        .session(session)
-                        .param("email", USERNAME)
-                        .param("password", PASSWORD)
-                        .contentType(MediaType.APPLICATION_FORM_URLENCODED))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/"));
-
         // Perform profile update and expect error param
         mockMvc.perform(post("/profile/update")
                         .session(session)
@@ -183,16 +164,6 @@ public class UserIntegrationTest extends IntegrationTestBase {
         expectedUserParam.setFirstname(FIRSTNAME);
         expectedUserParam.setLastname(LASTNAME);
 
-        // Perform login to trigger creation of session scoped bean userSessionData
-        mockMvc.perform(post("/login")
-                        .with(csrf())
-                        .session(session)
-                        .param("email", USERNAME)
-                        .param("password", PASSWORD)
-                        .contentType(MediaType.APPLICATION_FORM_URLENCODED))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/"));
-
         // Perform password update
         mockMvc.perform(post("/profile/update/password")
                         .session(session)
@@ -215,16 +186,6 @@ public class UserIntegrationTest extends IntegrationTestBase {
         final UserRequestDto expectedUserParam = new UserRequestDto();
         expectedUserParam.setPassword(newPassword);
         expectedUserParam.setPasswordConfirmation(newPassword);
-
-        // Perform login to trigger creation of session scoped bean userSessionData
-        mockMvc.perform(post("/login")
-                        .with(csrf())
-                        .session(session)
-                        .param("email", USERNAME)
-                        .param("password", PASSWORD)
-                        .contentType(MediaType.APPLICATION_FORM_URLENCODED))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/"));
 
         // Perform password update
         mockMvc.perform(post("/profile/update/password")

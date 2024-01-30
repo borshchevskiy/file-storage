@@ -79,6 +79,16 @@ public class SearchIntegrationTest extends IntegrationTestBase {
                 .webAppContextSetup(webApplicationContext)
                 .apply(springSecurity())
                 .build();
+
+        // Perform login to trigger creation of session scoped bean userSessionData
+        mockMvc.perform(post("/login")
+                        .with(csrf())
+                        .session(session)
+                        .param("email", USERNAME)
+                        .param("password", PASSWORD)
+                        .contentType(MediaType.APPLICATION_FORM_URLENCODED))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/"));
     }
 
     @AfterEach
@@ -92,16 +102,6 @@ public class SearchIntegrationTest extends IntegrationTestBase {
 
     @Test
     public void emptyQuerySearch() throws Exception {
-        // Perform login to trigger creation of session scoped bean userSessionData
-        mockMvc.perform(post("/login")
-                        .with(csrf())
-                        .session(session)
-                        .param("email", USERNAME)
-                        .param("password", PASSWORD)
-                        .contentType(MediaType.APPLICATION_FORM_URLENCODED))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/"));
-
         String query = null;
 
         mockMvc.perform(get("/search")
@@ -114,16 +114,6 @@ public class SearchIntegrationTest extends IntegrationTestBase {
 
     @Test
     public void search() throws Exception {
-        // Perform login to trigger creation of session scoped bean userSessionData
-        mockMvc.perform(post("/login")
-                        .with(csrf())
-                        .session(session)
-                        .param("email", USERNAME)
-                        .param("password", PASSWORD)
-                        .contentType(MediaType.APPLICATION_FORM_URLENCODED))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/"));
-
         String query = "1";
 
         String rootPath = "";
