@@ -17,7 +17,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- *  Class provides methods to perform search actions in storage.
+ * Class provides methods to perform search actions in storage.
  */
 @Service
 @RequiredArgsConstructor
@@ -29,18 +29,30 @@ public class SearchServiceImpl implements SearchService {
 
     /**
      * Method performs search of files and directories which contain query value in their path or name.
-     * Files and directories are searched separately, then results are combined into final list.
+     * At first all user's items are found, then files and directories are searched separately,
+     * then results are combined into final list.
+     * <p>
+     * Because search is made recursively from the root, all elements in 'allUserItems'
+     * will be of 'file' type in Minio's representation (their {@link Item#isDir()} method will return false).
+     * It happens because empty folder in Minio must contain an empty file with blank name and zero size.
+     * This empty files still can be found during recursive search.
+     * Lists of files and directories are defined from user's items
+     * in {@link SearchServiceImpl#searchFiles(String, List)} and
+     * {@link SearchServiceImpl#searchDirectories(String, List)}.
+     *
      * @param query value to be found.
      * @return {@link List} of {@link FileItemDto} reflecting files and directories found.
      */
     @Override
     public List<FileItemDto> search(String query) {
-        List<Item> allUserItems = minioRepository.getItemsByPath(
-                FilePathUtil.addUserDirectoryToPath(userSessionData, ""), true);
+        List<Item> itemsContainQuery = minioRepository
+                .getItemsByPath(userSessionData.getUserDirectory(), true)
+                .stream()
+                .filter(item -> item.objectName().contains(query))
+                .toList();
 
-        List<FileItemDto> files = searchFiles(query, allUserItems);
-
-        Set<FileItemDto> directories = searchDirectories(query, allUserItems);
+        List<FileItemDto> files = searchFiles(query, itemsContainQuery);
+        Set<FileItemDto> directories = searchDirectories(query, itemsContainQuery);
 
         List<FileItemDto> results = new ArrayList<>();
         results.addAll(directories);
@@ -51,21 +63,21 @@ public class SearchServiceImpl implements SearchService {
 
     /**
      * Method used to search directories which contain query value in their path or name.
-     * First, method filters all paths in user's storage to keep only ones that contain query value.
-     * After that, for each path each directory name is checked to find all subpaths corresponding search query.
+     * First, method filters all paths that are directory paths (end with '/').
+     * After that, each path is checked to find all subpaths corresponding search query.
      * <p>
      * E.g. if storage has the only path = "dir1/dir/dir1/" and search query = "1",
      * correct search result should be 2 paths: "dir<b>1</b>/" and "dir1/dir/dir<b>1</b>/".
+     *
      * @param query value to be found.
-     * @param allUserItems list of all user's objects.
+     * @param items list of all user's objects.
      * @return set of {@link FileItemDto} representing directories found.
      */
-    private Set<FileItemDto> searchDirectories(String query, List<Item> allUserItems) {
+    private Set<FileItemDto> searchDirectories(String query, List<Item> items) {
         Set<FileItemDto> directories = new HashSet<>();
-        Set<String> pathsContainingQuery = allUserItems.stream()
-                .map(item -> item.isDir() ? item.objectName() : FilePathUtil.getParent(item.objectName()))
-                .map(path -> FilePathUtil.removeUserDirectoryFromPath(userSessionData, path))
-                .filter(path -> path.contains(query))
+        Set<String> pathsContainingQuery = items.stream()
+                .map(item -> FilePathUtil.removeUserDirectoryFromPath(userSessionData, item.objectName()))
+                .filter(itemName -> itemName.endsWith("/"))
                 .collect(Collectors.toSet());
 
         for (String path : pathsContainingQuery) {
@@ -86,18 +98,20 @@ public class SearchServiceImpl implements SearchService {
                     directories.add(directory);
                 }
             }
-
         }
         return directories;
     }
+
     /**
      * Method used to search files which contain query value in their names.
+     *
      * @param query value to be found.
-     * @param allUserItems list of all user's objects.
+     * @param items list of all user's objects.
      * @return list of {@link FileItemDto} representing files found.
      */
-    private List<FileItemDto> searchFiles(String query, List<Item> allUserItems) {
-        return allUserItems.stream()
+    private List<FileItemDto> searchFiles(String query, List<Item> items) {
+        return items.stream()
+                .filter(item -> !item.objectName().endsWith("/"))
                 .filter(item -> {
                     String name = FilePathUtil.getName(item.objectName());
                     return name.contains(query);

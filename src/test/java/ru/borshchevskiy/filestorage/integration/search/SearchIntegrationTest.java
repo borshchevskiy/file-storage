@@ -130,7 +130,7 @@ public class SearchIntegrationTest extends IntegrationTestBase {
         /*
         Create directories:
         user-{id}-files/dir1/
-        user-{id}-files/dir1/innerDir1
+        user-{id}-files/dir1/innerDir1/
         user-{id}-files/dir11/
         user-{id}-files/dir2/
          */
