@@ -181,6 +181,15 @@
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>0.8.11</version>
+                <configuration>
+                    <excludes>
+                        <exclude>ru/borshchevskiy/filestorage/*.class</exclude>
+                        <exclude>ru/borshchevskiy/filestorage/dto/</exclude>
+                        <exclude>ru/borshchevskiy/filestorage/entity/</exclude>
+                        <exclude>ru/borshchevskiy/filestorage/config/</exclude>
+                        <exclude>ru/borshchevskiy/filestorage/exception/</exclude>
+                    </excludes>
+                </configuration>
                 <executions>
                     <execution>
                         <goals>
