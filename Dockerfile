@@ -6,7 +6,7 @@ WORKDIR /file-storage-app
 ADD pom.xml .
 RUN mvn verify --fail-never
 COPY . .
-RUN mvn package -Dmaven.test.skip=true
+RUN ["mvn", "package", "-Dmaven.test.skip=true"]
 
 #
 # Package stage

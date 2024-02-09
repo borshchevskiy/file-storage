@@ -4,27 +4,27 @@ services:
 
   db:
     image: postgres:15.3
-    hostname: db
+#    hostname: db
     restart: always
     ports:
       - "5432:5432"
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: file_storage
-      PGDATA: /data/postgres
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      PGDATA: ${PGDATA}
     volumes:
       - ./imports/db/:/docker-entrypoint-initdb.d/
 
   redis:
     image: redis:7.0
-    hostname: redis
+#    hostname: redis
     restart: always
     ports:
       - "6379:6379"
     environment:
-      REDIS_PASSWORD: redis
-      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      REDIS_PORT: ${REDIS_PORT}
 
   minio:
     image: quay.io/minio/minio:RELEASE.2024-01-31T20-20-33Z
@@ -33,19 +33,16 @@ services:
       - "9000:9000"
       - "9001:9001"
     environment:
-      MINIO_ROOT_USER: MINIO
-      MINIO_ROOT_PASSWORD: MINIOMINIO
+      MINIO_ROOT_USER: ${MINIO_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_PASSWORD}
 
   app:
     build: .
-    hostname: app
+#    hostname: app
     depends_on:
-      db:
-        condition: service_started
-      redis:
-        condition: service_started
-      minio:
-        condition: service_started
+      - db
+      - redis
+      - minio
     ports:
       - "8080:8080"
 
