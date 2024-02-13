@@ -3,7 +3,10 @@ package ru.borshchevskiy.filestorage.web.controllers;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.fileupload2.core.*;
+import org.apache.commons.fileupload2.core.MultipartInput.ItemInputStream;
 import org.apache.commons.fileupload2.jakarta.JakartaServletFileUpload;
+import org.apache.commons.io.input.BoundedInputStream;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -35,6 +38,8 @@ import static org.springframework.http.MediaType.APPLICATION_OCTET_STREAM_VALUE;
 @RequestMapping("/files")
 public class FilesController {
 
+    @Value("${app.max-file-size:10485760}")
+    private long maxFileSize;
     private final FileService fileService;
 
     /**
@@ -79,23 +84,32 @@ public class FilesController {
         }
 
         JakartaServletFileUpload upload = new JakartaServletFileUpload<>();
-
+        upload.setFileSizeMax(maxFileSize);
         try {
             FileItemInputIterator itemIterator = upload.getItemIterator(request);
-
             while (itemIterator.hasNext()) {
                 FileItemInput item = itemIterator.next();
-                if (!item.isFormField()) {
+                if (!item.isFormField() && StringUtils.hasText(item.getName())) {
                     String name = item.getName();
-                    if (StringUtils.hasText(name)) {
-                        InputStream stream = item.getInputStream();
+                    try (InputStream stream = item.getInputStream()) {
                         fileService.uploadFile(stream, path, name);
-                        stream.close();
+                        if (stream instanceof BoundedInputStream bis
+                                && bis.isPropagateClose()
+                                && bis.getCount() >= maxFileSize) {
+                            throw new FileUploadByteCountLimitException(
+                                    "Error occurred while processing request! File is too large.",
+                                    bis.getCount(),
+                                    maxFileSize,
+                                    name,
+                                    item.getFieldName());
+                        }
                     }
                 }
             }
-        } catch (IOException exception) {
-            throw new MultipartProcessingException("Error occurred while processing request! Please, try again.");
+        } catch (FileUploadByteCountLimitException e) {
+            throw new MultipartProcessingException("Error occurred while processing request! File is too large.", e);
+        } catch (IOException e) {
+            throw new MultipartProcessingException("Error occurred while processing request! Please, try again.", e);
         }
         redirectAttributes.addAttribute("path", path);
         return "redirect:/updateFilesList";
@@ -104,7 +118,7 @@ public class FilesController {
     /**
      * Method handles file renaming requests.
      *
-     * @param path path to the directory where file is located.
+     * @param path               path to the directory where file is located.
      * @param oldName            old name of the file.
      * @param newName            new name of the file.
      * @param redirectAttributes {@link RedirectAttributes}.
@@ -125,8 +139,8 @@ public class FilesController {
     /**
      * Method deletes specified file.
      *
-     * @param path path to the directory where file is located.
-     * @param name name of the file to be deleted.
+     * @param path               path to the directory where file is located.
+     * @param name               name of the file to be deleted.
      * @param redirectAttributes {@link RedirectAttributes}.
      * @return redirect to update viewed file list.
      */

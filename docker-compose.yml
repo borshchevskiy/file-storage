@@ -4,7 +4,6 @@ services:
 
   db:
     image: postgres:15.3
-#    hostname: db
     restart: always
     ports:
       - "5432:5432"
@@ -18,7 +17,6 @@ services:
 
   redis:
     image: redis:7.0
-#    hostname: redis
     restart: always
     ports:
       - "6379:6379"
@@ -38,7 +36,6 @@ services:
 
   app:
     build: .
-#    hostname: app
     depends_on:
       - db
       - redis

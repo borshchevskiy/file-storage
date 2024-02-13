@@ -1,6 +1,6 @@
 # File Storage
 
-Cloud file storage. User can upload and store their files.
+Cloud file storage. Users can upload and store their files.
 
 ## Component diagram
 

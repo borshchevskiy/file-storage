@@ -1,8 +1,6 @@
 spring:
   servlet:
     multipart:
-      max-file-size: 100MB
-      max-request-size: 100MB
       enabled: false
   thymeleaf:
     encoding: UTF-8
@@ -40,6 +38,7 @@ app:
   user-folder:
     prefix: user-
     suffix: -files
+  max-file-size: 104857600
 
 
 
