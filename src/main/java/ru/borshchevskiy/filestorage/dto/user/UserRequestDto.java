@@ -4,9 +4,9 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
-import ru.borshchevskiy.filestorage.dto.validation.OnCreate;
-import ru.borshchevskiy.filestorage.dto.validation.OnPasswordUpdate;
-import ru.borshchevskiy.filestorage.dto.validation.OnUpdate;
+import ru.borshchevskiy.filestorage.dto.validation.groups.OnCreate;
+import ru.borshchevskiy.filestorage.dto.validation.groups.OnPasswordUpdate;
+import ru.borshchevskiy.filestorage.dto.validation.groups.OnUpdate;
 
 import java.io.Serializable;
 

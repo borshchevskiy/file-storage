@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import ru.borshchevskiy.filestorage.dto.user.UserRequestDto;
-import ru.borshchevskiy.filestorage.dto.validation.OnCreate;
+import ru.borshchevskiy.filestorage.dto.validation.groups.OnCreate;
 import ru.borshchevskiy.filestorage.service.UserService;
 
 import java.util.ArrayList;

@@ -50,6 +50,8 @@ function enableFilesInputElements() {
 
 async function handleFilesSubmit(event) {
     event.preventDefault();
+    const messagePlaceholder = document.getElementById('uploadResultMessagePlaceholder');
+    messagePlaceholder.innerHTML = '';
     disableFilesInputElements();
 
     const form = event.currentTarget;
@@ -58,7 +60,6 @@ async function handleFilesSubmit(event) {
     const headers = new Headers();
 
     headers.set(header, token);
-
     const fetchOptions = {
         method: form.method,
         body: formData,
@@ -66,10 +67,21 @@ async function handleFilesSubmit(event) {
         credentials: 'include',
     };
 
-    let response = await fetch(url, fetchOptions);
-
+    try {
+        let response = await fetch(url, fetchOptions);
+        await handleFormSubmitResponse(response);
+    } catch (error) {
+        const messagePlaceholder = document.getElementById('uploadResultMessagePlaceholder');
+        const wrapper = document.createElement('div');
+        wrapper.innerHTML = [
+            '<div class="alert alert-danger alert-dismissible" role="alert">' +
+            '   <div>"Error while uploading file. You might be exceeding file size limit</div>' +
+            '   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+            '</div>'
+        ].join('');
+        messagePlaceholder.append(wrapper);
+    }
     removeFileNames();
     enableFilesInputElements();
-    await handleFormSubmitResponse(response);
     filesInputForm.reset();
 }

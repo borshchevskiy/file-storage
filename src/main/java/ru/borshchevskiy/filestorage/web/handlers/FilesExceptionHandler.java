@@ -34,10 +34,8 @@ public class FilesExceptionHandler {
     @ExceptionHandler(NotMultipartRequestException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public String handleNotMultipartRequestException(NotMultipartRequestException exception,
-                                                       RedirectAttributes redirectAttributes) {
-
-        redirectAttributes.addFlashAttribute("errors", List.of(exception.getMessage()));
-
+                                                     Model model) {
+        model.addAttribute("errors", List.of(exception.getMessage()));
         log.error("Not multipart request." + exception.getMessage());
         return "errors/error400";
     }
@@ -45,10 +43,8 @@ public class FilesExceptionHandler {
     @ExceptionHandler(MultipartProcessingException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public String handleMultipartProcessingException(MultipartProcessingException exception,
-                                                     RedirectAttributes redirectAttributes) {
-
-        redirectAttributes.addFlashAttribute("errors", List.of(exception.getMessage()));
-
+                                                     Model model) {
+        model.addAttribute("errors", List.of(exception.getMessage()));
         log.error("Error while processing multipart request. " + exception);
         return "errors/error400";
     }

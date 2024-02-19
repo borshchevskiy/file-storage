@@ -1,6 +1,7 @@
 package ru.borshchevskiy.filestorage.web.controllers;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import ru.borshchevskiy.filestorage.service.FileService;
 import ru.borshchevskiy.filestorage.util.FilePathUtil;
+import ru.borshchevskiy.filestorage.util.FileSizeUtil;
 
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -21,6 +23,8 @@ import java.nio.charset.StandardCharsets;
 @RequiredArgsConstructor
 public class MainPageController {
 
+    @Value("${app.max-file-size:10485760}")
+    private long maxFileSize;
     private final FileService fileService;
 
     /**
@@ -42,6 +46,7 @@ public class MainPageController {
 
             model.addAttribute("breadcrumbs", FilePathUtil.generateBreadcrumbs(decodedPath));
             model.addAttribute("filesList", fileService.getItemsByPath(decodedPath));
+            model.addAttribute("maxFileSize", FileSizeUtil.getViewFileSize(maxFileSize));
 
             if (!path.isEmpty()) {
                 model.addAttribute("parentPath", FilePathUtil.getParent(decodedPath));

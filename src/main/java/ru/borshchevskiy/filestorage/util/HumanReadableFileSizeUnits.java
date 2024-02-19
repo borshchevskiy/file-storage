@@ -1,4 +1,4 @@
-package ru.borshchevskiy.filestorage.mapper;
+package ru.borshchevskiy.filestorage.util;
 
 /**
  * Enumeration representing size units for information volume.

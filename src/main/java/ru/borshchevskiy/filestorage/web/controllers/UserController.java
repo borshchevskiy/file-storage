@@ -14,11 +14,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import ru.borshchevskiy.filestorage.dto.user.UserRequestDto;
 import ru.borshchevskiy.filestorage.dto.user.UserResponseDto;
-import ru.borshchevskiy.filestorage.dto.validation.OnPasswordUpdate;
-import ru.borshchevskiy.filestorage.dto.validation.OnUpdate;
+import ru.borshchevskiy.filestorage.dto.validation.groups.OnPasswordUpdate;
+import ru.borshchevskiy.filestorage.dto.validation.groups.OnUpdate;
 import ru.borshchevskiy.filestorage.service.UserService;
 import ru.borshchevskiy.filestorage.web.session.UserSessionData;
-import ru.borshchevskiy.filestorage.web.util.ControllerUtil;
+import ru.borshchevskiy.filestorage.util.ControllerUtil;
 
 import java.util.List;
 

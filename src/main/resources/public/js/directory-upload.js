@@ -77,9 +77,8 @@ async function handleDirSubmit(event) {
     };
 
     let response = await fetch(url, fetchOptions);
-
-    dirInputForm.reset();
+    await handleFormSubmitResponse(response);
     removeDirNames();
     enableDirInputElements();
-    await handleFormSubmitResponse(response);
+    dirInputForm.reset();
 }

@@ -75,10 +75,14 @@
                         <input class="form-control mb-3" type="file" id="filesInput" name="file" style="display: none"
                                multiple>
                     </label>
+                    <div class="mb-3 text-center" id="maxFileSizeNotice">
+                        <span class="form-text" th:text="|Maximum file size is ${maxFileSize}.|"></span>
+                    </div>
                     <div class="text-center">
                         <input class="btn btn-dark" type="submit" value="Upload file(s)" id="filesInputSubmit">
                     </div>
                 </form>
+                <div class="mt-3" id="uploadResultMessagePlaceholder"></div>
             </div>
         </div>
         <!--Upload folder form-->

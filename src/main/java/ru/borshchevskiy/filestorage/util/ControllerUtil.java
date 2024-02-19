@@ -1,4 +1,4 @@
-package ru.borshchevskiy.filestorage.web.util;
+package ru.borshchevskiy.filestorage.util;
 
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.validation.BindingResult;
