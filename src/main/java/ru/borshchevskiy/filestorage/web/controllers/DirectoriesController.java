@@ -1,17 +1,25 @@
 package ru.borshchevskiy.filestorage.web.controllers;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import ru.borshchevskiy.filestorage.dto.validation.ValidDirectoryName;
 import ru.borshchevskiy.filestorage.service.DirectoryService;
+import ru.borshchevskiy.filestorage.util.ControllerUtil;
+
+import java.util.List;
 
 /**
  * Handles directories manipulation requests.
  */
 @Controller
+@Validated
 @RequestMapping("/directories")
 @RequiredArgsConstructor
 public class DirectoriesController {
@@ -27,11 +35,11 @@ public class DirectoriesController {
      */
     @PostMapping(value = "create")
     public String createDirectory(@RequestParam(value = "path") String path,
-                                  @RequestParam(value = "newDirectoryName") String newDirectoryName,
+                                  @RequestParam(value = "newDirectoryName") @ValidDirectoryName String newDirectoryName,
                                   RedirectAttributes redirectAttributes) {
 
-        directoryService.createDirectory(path, newDirectoryName);
         redirectAttributes.addAttribute("path", path);
+        directoryService.createDirectory(path, newDirectoryName);
 
         return "redirect:/updateFilesList";
     }

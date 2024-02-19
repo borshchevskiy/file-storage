@@ -1,5 +1,7 @@
 package ru.borshchevskiy.filestorage.web.handlers;
 
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.ui.Model;
@@ -26,7 +28,7 @@ public class FilesExceptionHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public String handleMinioRepositoryException(MinioRepositoryException exception,
                                                  Model model) {
-        model.addAttribute("exceptionMessage", exception.getMessage());
+        model.addAttribute("exceptionMessages", exception.getMessage());
         log.error("Repository related exception. " + exception.getMessage() + exception);
         return "errors/error500";
     }
@@ -35,7 +37,7 @@ public class FilesExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public String handleNotMultipartRequestException(NotMultipartRequestException exception,
                                                      Model model) {
-        model.addAttribute("errors", List.of(exception.getMessage()));
+        model.addAttribute("exceptionMessages", List.of(exception.getMessage()));
         log.error("Not multipart request." + exception.getMessage());
         return "errors/error400";
     }
@@ -44,8 +46,19 @@ public class FilesExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public String handleMultipartProcessingException(MultipartProcessingException exception,
                                                      Model model) {
-        model.addAttribute("errors", List.of(exception.getMessage()));
+        model.addAttribute("exceptionMessages", List.of(exception.getMessage()));
         log.error("Error while processing multipart request. " + exception);
+        return "errors/error400";
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public String handleConstraintViolationException(ConstraintViolationException exception,
+                                                     Model model) {
+        model.addAttribute("exceptionMessages", exception.getConstraintViolations().stream()
+                .map(ConstraintViolation::getMessage)
+                .toList());
+        log.error("Constraint violation." + exception.getMessage());
         return "errors/error400";
     }
 }
