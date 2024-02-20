@@ -80,11 +80,11 @@ async function handleDirSubmit(event) {
         let response = await fetch(url, fetchOptions);
         await handleFormSubmitResponse(response);
     } catch (error) {
-        const messagePlaceholder = document.getElementById('uploadResultMessagePlaceholder');
+        const messagePlaceholder = document.getElementById('dirUploadResultMessagePlaceholder');
         const wrapper = document.createElement('div');
         wrapper.innerHTML = [
             '<div class="alert alert-danger alert-dismissible" role="alert">' +
-            '   <div>"Error while uploading file. You might be exceeding file size limit</div>' +
+            '   <div>"Error while uploading one of the files. You might be exceeding file size limit</div>' +
             '   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
             '</div>'
         ].join('');
