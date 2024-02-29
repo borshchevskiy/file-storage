@@ -48,6 +48,8 @@ services:
         condition: service_started
       minio:
         condition: service_started
+    env_file:
+      - .env
     ports:
       - "8080:8080"
 
