@@ -82,7 +82,7 @@ public class FilesController {
             throw new NotMultipartRequestException("No file found within request!");
         }
 
-        JakartaServletFileUpload upload = new JakartaServletFileUpload<>();
+        JakartaServletFileUpload<?, ?> upload = new JakartaServletFileUpload<>();
         upload.setFileSizeMax(maxFileSize);
         try {
             FileItemInputIterator itemIterator = upload.getItemIterator(request);
