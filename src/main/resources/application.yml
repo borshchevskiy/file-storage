@@ -5,9 +5,9 @@ spring:
   thymeleaf:
     encoding: UTF-8
   datasource:
-    url: jdbc:postgresql://${HOST}:${POSTGRES_PORT}/${POSTGRES_DB}?currentSchema=${POSTGRES_SCHEMA}
-    username: ${POSTGRES_USER}
-    password: ${POSTGRES_PASSWORD}
+    url: jdbc:postgresql://localhost:5432/file_storage?currentSchema=file_storage
+    username: postgres
+    password: postgres
     driver-class-name: org.postgresql.Driver
   jpa:
     properties:
@@ -20,19 +20,19 @@ spring:
   liquibase:
     change-log: classpath:/db/changelog/db.changelog-master.yaml
     enabled: true
-    default-schema: ${POSTGRES_SCHEMA}
+    default-schema: file_storage
   session:
     timeout: 86400
   data:
     redis:
-      host: ${HOST}
-      port: ${REDIS_PORT}
-      password: ${REDIS_PASSWORD}
+      host: localhost
+      port: 6379
+      password: redis
 minio:
-  url: http://${HOST}:${MINIO_PORT}
+  url: http://localhost:9000
   bucket: user-files
-  user: ${MINIO_USER}
-  password: ${MINIO_PASSWORD}
+  user: MINIO
+  password: MINIOMINIO
 
 app:
   user-folder:
